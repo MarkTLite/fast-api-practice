@@ -61,7 +61,7 @@ class ArticleResponse(BaseModel):
     title: str
     content: str
     published: bool
-    user = ArticleUser
+    user: ArticleUser
 
     class Config:
         orm_mode = True

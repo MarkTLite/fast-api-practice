@@ -4,6 +4,7 @@ User Controllers
 
 from sqlalchemy.orm.session import Session
 from typing import List
+from fastapi import HTTPException, status
 
 from schemas import UserRequest
 from db.models import User
@@ -30,12 +31,23 @@ def read_all_users(db: Session) -> List[User]:
 
 def read_specific_user(db: Session, id: int):
     """Read and return a user by id"""
-    return db.query(User).filter(User.id == id).first()
+    user = db.query(User).filter(User.id == id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"USer with {id} not found",
+        )
+    return user
 
 
 def update_specific_user(db: Session, id: int, request: UserRequest):
     """Update a specific user by id"""
     user = db.query(User).filter(User.id == id)
+    if not user.first():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"USer with {id} not found",
+        )
     user.update(
         {
             User.username: request.username,
@@ -50,6 +62,12 @@ def update_specific_user(db: Session, id: int, request: UserRequest):
 def delete_specific_user(id: int, db: Session):
     """Delete specific user by id"""
     user = db.query(User).filter(User.id == id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"USer with {id} not found",
+        )
+
     db.delete(user)
     db.commit()
     return "success"
