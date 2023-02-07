@@ -1,16 +1,18 @@
 """
-Helper Functions for users
+User Controllers
 """
 
 from sqlalchemy.orm.session import Session
+from typing import List
+
 from schemas import UserRequest
-from db.models import DbUser
+from db.models import User
 from db.hash import Hash
 
 
-def create_user(db: Session, request: UserRequest):
+def create_user(db: Session, request: UserRequest) -> User:
     """Create new user in db and return"""
-    new_user = DbUser(
+    new_user = User(
         email=request.email,
         username=request.username,
         password=Hash.bcrypt(request.password),
@@ -19,3 +21,35 @@ def create_user(db: Session, request: UserRequest):
     db.commit()
     db.refresh(new_user)
     return new_user
+
+
+def read_all_users(db: Session) -> List[User]:
+    """Read All Users in Db and return"""
+    return db.query(User).all()
+
+
+def read_specific_user(db: Session, id: int):
+    """Read and return a user by id"""
+    return db.query(User).filter(User.id == id).first()
+
+
+def update_specific_user(db: Session, id: int, request: UserRequest):
+    """Update a specific user by id"""
+    user = db.query(User).filter(User.id == id)
+    user.update(
+        {
+            User.username: request.username,
+            User.email: request.email,
+            User.password: Hash.bcrypt(request.password),
+        }
+    )
+    db.commit()
+    return "success"
+
+
+def delete_specific_user(id: int, db: Session):
+    """Delete specific user by id"""
+    user = db.query(User).filter(User.id == id).first()
+    db.delete(user)
+    db.commit()
+    return "success"
