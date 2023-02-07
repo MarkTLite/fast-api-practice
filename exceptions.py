@@ -1,0 +1,5 @@
+"""
+Different custom Exceptions
+"""
+
+class 
