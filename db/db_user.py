@@ -40,8 +40,14 @@ def read_specific_user(db: Session, id: int):
         )
     return user
 
-def read_user_by_username():
-    pass
+def read_user_by_username(db: Session, username: str):
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise Custom404Exception(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User: {username} not found",
+        )
+    return user
 
 def update_specific_user(db: Session, id: int, request: UserRequest):
     """Update a specific user by id"""

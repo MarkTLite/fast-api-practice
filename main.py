@@ -1,17 +1,26 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from auth import authentication
-from router import user, article, blog_get, blog_post, product
 from db import models
 from db.database import engine
 from exceptions import Custom404Exception
+from router import (
+    user,
+    article,
+    blog_get,
+    blog_post,
+    product,
+    files,
+)
 
 
 app = FastAPI()
 app.include_router(authentication.router)
 app.include_router(user.router)
+app.include_router(files.router)
 app.include_router(product.router)
 app.include_router(article.router)
 app.include_router(blog_get.router)
@@ -39,3 +48,6 @@ app.add_middleware(
     allow_headers=["*"],
     allow_methods=["*"],
 )
+
+# For Static Files
+app.mount('/uploads', StaticFiles(directory='uploads') ,name='uploads')
