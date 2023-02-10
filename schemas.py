@@ -65,3 +65,8 @@ class ArticleResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+class ProductRequest(BaseModel):
+    title: str
+    description: str
+    price: float

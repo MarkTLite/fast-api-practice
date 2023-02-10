@@ -1,4 +1,5 @@
 from typing import Optional, List
+import time
 
 from fastapi import APIRouter, Header, Cookie, Form
 from fastapi.responses import (
@@ -14,9 +15,14 @@ router = APIRouter(
 
 products = ["watch", "phone"]
 
+async def time_consuming_functionality():
+    time.sleep(2.0)
+    return 'ok'
+
 # Custom Response basic
 @router.get("/all")
-def get_all_products():
+async def get_all_products():
+    await time_consuming_functionality() # Add async without await to let this be bypassed.
     response = Response(
         content=" ".join(products),
         media_type="text/plain",
